@@ -9,7 +9,7 @@ class SineEffect final : public AudioEffect {
 
 public:
 
-  SineEffect(const float amplitude, const float frequency) :
+  SineEffect(const float amplitude = 0.25f, const float frequency = 440.f) :
     amplitude(amplitude),
     frequency(frequency) {
   }

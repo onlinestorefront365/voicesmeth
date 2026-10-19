@@ -84,6 +84,23 @@ fun AudioDevices.selectOutputDevice(id: Int, callback: (id: Int) -> Unit) {
   }
 }
 
+fun AudioDevices.selectMode(id: Int, callback: (id: Int) -> Unit) {
+  val names = arrayOf("VOICE", "NOISE", "SINE", "SWEEP")
+  val oldindex = id.coerceIn(0, names.size - 1)
+
+  with(AlertDialog.Builder(context)) {
+    setTitle(context.getString(R.string.select_mode))
+    setSingleChoiceItems(names, oldindex) { dialog, newindex ->
+      dialog.dismiss()
+      if (newindex != oldindex) {
+        callback(newindex)
+      }
+    }
+    create()
+    show()
+  }
+}
+
 fun AudioDevices.selectChannels(id: Int, callback: (id: Int) -> Unit) {
   val names = arrayOf("MONO", "STEREO")
   val oldindex = id - 1

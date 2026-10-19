@@ -2,7 +2,32 @@ name: build.yml
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+
+  native-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure
+      run: cmake -S tests/native -B build/native -DCMAKE_BUILD_TYPE=Debug
+
+    - name: Build
+      run: cmake --build build/native
+
+    - name: Test
+      run: ctest --test-dir build/native --output-on-failure
 
   build:
 
@@ -11,13 +36,20 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@master
+      uses: actions/checkout@v4
 
     - name: Setup
-      uses: actions/setup-java@master
+      uses: actions/setup-java@v4
       with:
         java-version: '21'
-        distribution: 'oracle'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - name: Cache native dependencies
+      uses: actions/cache@v4
+      with:
+        path: voicesmith/.cpm
+        key: cpm-${{ hashFiles('voicesmith/src/main/cpp/**/libs/*.cmake') }}
 
     - name: Build
       run: ./gradlew assembleRelease

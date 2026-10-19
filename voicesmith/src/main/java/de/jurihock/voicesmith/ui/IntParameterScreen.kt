@@ -17,7 +17,7 @@ fun IntParameterScreen(modifier: Modifier = Modifier,
                        onChange: (value: Int) -> Unit) {
 
   fun get() : String {
-    return if (value.value > 0) "+${value.value}"
+    return if (min < 0 && value.value > 0) "+${value.value}"
     else "${value.value}"
   }
 
@@ -36,7 +36,7 @@ fun IntParameterScreen(modifier: Modifier = Modifier,
     Slider(
       value = value.value.toFloat(),
       valueRange = min.toFloat()..max.toFloat(),
-      steps = (max - min - 1) / inc,
+      steps = (max - min) / inc - 1,
       onValueChange = { set(it.roundToInt()) })
   }
 

@@ -1,6 +1,7 @@
 package de.jurihock.voicesmith
 
 import android.app.Application
+import android.content.pm.ApplicationInfo
 import de.jurihock.voicesmith.etc.Log
 import de.jurihock.voicesmith.io.AudioDevices
 import de.jurihock.voicesmith.io.AudioFeatures
@@ -30,8 +31,10 @@ class Main : Application() {
 
   override fun onCreate() {
     super.onCreate()
-    features()
-    devices()
+    if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+      features()
+      devices()
+    }
   }
 
 }

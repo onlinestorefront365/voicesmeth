@@ -55,28 +55,29 @@ abstract class AudioServiceActivity : ComponentActivity(), ServiceConnection {
   }
 
   private var service: AudioService? = null
+  private var bound = false
 
   private fun enableAudioService() {
-    try {
-      Log.i("Starting audio service")
-      startAudioService()
-      Log.i("Binding audio service")
-      bindAudioService()
-    } finally {
-      service = null
-    }
+    Log.i("Starting audio service")
+    startAudioService()
+    Log.i("Binding audio service")
+    bindAudioService()
+    bound = true
   }
 
   private fun disableAudioService() {
-    service?.let {
-      try {
+    try {
+      if (bound) {
         Log.i("Unbinding audio service")
         unbindAudioService()
+      }
+      if (service != null) {
         Log.i("Stopping audio service")
         stopAudioService()
-      } finally {
-        service = null
       }
+    } finally {
+      bound = false
+      service = null
     }
   }
 
@@ -96,7 +97,10 @@ abstract class AudioServiceActivity : ComponentActivity(), ServiceConnection {
         onAudioServiceStopped()
       } else {
         it.start()
-        onAudioServiceStarted()
+        // a failed start has already been reported via the service error callback
+        if (it.isStarted) {
+          onAudioServiceStarted()
+        }
       }
 
       if (!it.isStarted) {

@@ -1,9 +1,9 @@
-.PHONY: help build clean dev pair log key props
+.PHONY: help build clean test dev pair log key key-base64 props
 
 KEYDNA = CN=Juergen Hock, O=Voicesmith
 KEYARG = -keyalg RSA -keysize 2048 -validity 12345
 
-SDK = ~/Library/Android/sdk
+SDK ?= $(or $(ANDROID_HOME),$(ANDROID_SDK_ROOT),~/Library/Android/sdk)
 ADB = $(SDK)/platform-tools/adb
 
 HOST ?= $(shell bash -c 'read -p "HOST> " HOST; echo 192.168.178.$$HOST')
@@ -13,10 +13,12 @@ CODE ?= $(shell bash -c 'read -p "CODE> " CODE; echo $$CODE')
 help:
 	@echo build
 	@echo clean
+	@echo test
 	@echo dev
 	@echo pair
 	@echo log
 	@echo key
+	@echo key-base64
 	@echo props
 
 build:
@@ -24,6 +26,11 @@ build:
 
 clean:
 	@./gradlew clean
+
+test:
+	@cmake -S tests/native -B build/native -DCMAKE_BUILD_TYPE=Debug
+	@cmake --build build/native
+	@ctest --test-dir build/native --output-on-failure
 
 dev:
 	@$(ADB) devices
@@ -39,7 +46,7 @@ key:
 	@keytool -genkeypair -keystore secret.keystore -alias github-jurihock-voicesmith -dname '$(KEYDNA)' $(KEYARG)
 
 key-base64:
-	@base64 -i secret.keystore
+	@base64 < secret.keystore | tr -d '\n'
 
 props:
 	@realpath $(SDK) | sed 's/^/sdk.dir=/' > local.properties

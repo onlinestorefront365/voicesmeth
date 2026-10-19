@@ -3,6 +3,10 @@
   <string name="delay">Delay</string>
   <string name="input">Input</string>
   <string name="milliseconds">ms</string>
+  <string name="mode_voice">Voice</string>
+  <string name="mode_noise">Noise</string>
+  <string name="mode_sine">Sine</string>
+  <string name="mode_sweep">Sweep</string>
   <string name="mono">M</string>
   <string name="output">Output</string>
   <string name="permissions_rationale_dismiss">Dismiss</string>
@@ -10,6 +14,7 @@
   <string name="permissions_rationale_text">Microphone permission must be granted in order to use Voicesmith!</string>
   <string name="permissions_rationale_title">Permissions missing</string>
   <string name="pitch">Pitch</string>
+  <string name="select_mode">Select signal source</string>
   <string name="select_channels">Select signal path</string>
   <string name="select_input_device">Select input device</string>
   <string name="select_output_device">Select output device</string>

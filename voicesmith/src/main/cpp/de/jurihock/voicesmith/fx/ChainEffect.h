@@ -49,7 +49,7 @@ public:
       auto total = sizeof...(AudioEffects);
 
       auto i = keyval.first;
-      auto j = int(total) - 1;
+      auto j = total - 1;
 
       auto x = i % 2;
       auto y = x ^ 1;

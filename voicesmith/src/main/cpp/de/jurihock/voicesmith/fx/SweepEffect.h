@@ -9,7 +9,7 @@ class SweepEffect final : public AudioEffect {
 
 public:
 
-  SweepEffect(const float amplitude, const std::pair<float, float> frequencies, const float period) :
+  SweepEffect(const float amplitude = 0.25f, const std::pair<float, float> frequencies = {440.f, 880.f}, const float period = 2.f) :
     amplitude(amplitude),
     frequencies(frequencies),
     period(period) {

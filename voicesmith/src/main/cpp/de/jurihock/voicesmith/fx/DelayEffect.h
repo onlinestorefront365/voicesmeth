@@ -16,18 +16,20 @@ public:
 private:
 
   struct {
-    float samplerate;
-    size_t blocksize;
+    float samplerate = 0;
+    size_t blocksize = 0;
   } config;
 
   struct {
     struct {
       const double max = 1;
-      double min = 0;
+      std::atomic<double> min {0.0};
     } delay;
   } params;
 
-  std::deque<float> buffer;
-  std::mutex mutex;
+  // ring buffer holding the last maxdelay + 1 samples,
+  // so that the delay of exactly maxdelay samples is addressable
+  std::vector<float> buffer;
+  size_t head = 0;
 
 };

@@ -5,7 +5,7 @@
 #include <voicesmith/plug/AudioPlugin.h>
 #include <voicesmith/plug/TestAudioPlugin.h>
 
-TestAudioPlugin* make_plugin(const std::string& name, jna_callback* callback) {
+AudioPlugin* make_plugin(const std::string& name, jna_callback* callback) {
   if (name == "TestAudioPlugin") {
     return new TestAudioPlugin(callback);
   }

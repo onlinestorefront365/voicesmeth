@@ -8,7 +8,7 @@ class Noise final {
 public:
 
   Noise() :
-    generator(),
+    generator(std::random_device{}()),
     distribution(-1, +1) {
   }
 

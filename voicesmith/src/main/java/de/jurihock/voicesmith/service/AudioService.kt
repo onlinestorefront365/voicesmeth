@@ -28,6 +28,7 @@ class AudioService : Service(), SharedPreferences.OnSharedPreferenceChangeListen
         preferences.samplerate,
         preferences.blocksize,
         preferences.channels)
+      plugin?.set("mode", preferences.modeName)
       plugin?.set("delay", preferences.delay.toString())
       plugin?.set("pitch", preferences.pitch.toString())
       plugin?.set("timbre", preferences.timbre.toString())
@@ -101,6 +102,7 @@ class AudioService : Service(), SharedPreferences.OnSharedPreferenceChangeListen
       "samplerate" -> reset()
       "blocksize" -> reset()
       "channels" -> reset()
+      "mode" -> plugin?.set("mode", preferences.modeName)
       "delay" -> plugin?.set("delay", preferences.delay.toString())
       "pitch" -> plugin?.set("pitch", preferences.pitch.toString())
       "timbre" -> plugin?.set("timbre", preferences.timbre.toString())

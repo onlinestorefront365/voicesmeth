@@ -120,9 +120,23 @@ void AudioStream::open() {
         oboe::convertToText(result)));
   }
 
+  auto framesperblock = state.stream->getFramesPerDataCallback();
+
+  if (framesperblock <= 0) {
+    // fallback for streams with an unspecified callback size
+    framesperblock = state.stream->getFramesPerBurst();
+  }
+
+  if (framesperblock <= 0) {
+    close();
+    throw std::runtime_error(
+      $("Unable to determine the {0} stream block size!",
+        oboe::convertToText(direction)));
+  }
+
   config.device.get = state.stream->getDeviceId();
   config.samplerate.get = state.stream->getSampleRate();
-  config.blocksize.get = state.stream->getFramesPerDataCallback() * state.stream->getChannelCount();
+  config.blocksize.get = framesperblock * state.stream->getChannelCount();
   config.blocksize.max = state.stream->getBufferSizeInFrames() * state.stream->getChannelCount();
   config.channels.get = state.stream->getChannelCount();
   config.channels.max = state.stream->getHardwareChannelCount();

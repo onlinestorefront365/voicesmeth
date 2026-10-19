@@ -6,6 +6,18 @@ Severity: **High** = crash/UB/wrong behaviour reachable in normal use · **Mediu
 
 ---
 
+## 0. Fix status (update)
+
+All findings below were addressed in a follow-up commit except where noted. Verified: host-side unit tests (new, `tests/native`, ASan+UBSan) pass; the C++ files `AudioPipeline`, `AudioStream`, `AudioSource`, `TestAudioPlugin`, `AudioPluginFactory` pass a clang `-fsyntax-only -Wall -Werror` check against the real Oboe/eventpp/stftPitchShift headers. **Not verified:** the Gradle/Kotlin build, lint, and anything on a device (no Android SDK in the sandbox).
+
+- **Fixed:** H1–H3, M1–M6, M8, L1–L2, L3 (channel importance only), L4–L7, L9–L12, all CI findings except SHA pinning.
+- **Not changed:** M7 (Oboe error-callback close; the audio callback uses its `stream` argument rather than `state.stream`, so the race is narrower than first stated), L3 notification wording (author's text), L8 (explicit coroutines dependency; not verifiable offline), L10 `-Werror` (kept), L12 `KEYDNA` name (kept).
+- **Caveats:** H1's old behaviour was UB but not reproducible under ASan (reads stayed inside the deque's chunk); the new ring buffer is covered by exact-offset tests instead. CI actions are pinned to major version tags (`@v4`, `@v2`), not commit SHAs, because SHAs could not be verified offline. `-Ofast` became `-O3` (no `-ffast-math`); check performance on a device.
+- **Also found while fixing:** `ChainEffect` had a signed/unsigned comparison GCC rejects (fixed); `Noise` used a fixed seed so both stereo channels were identical noise (now seeded from `random_device`); `Oscillator` amplitude drifted over time (now renormalised); `Header.h` lacked `<cstring>`/`<cstdint>`.
+- **New:** a signal source selector (VOICE / NOISE / SINE / SWEEP) in the UI, backed by `SelectorEffect`. Noise/sine/sweep run at amplitude 0.25 as a hearing-safety default. Unknown plugin parameters now raise an error instead of being ignored. `tests/native` + `make test` + a `native-tests` CI job, and Dependabot for Actions and Gradle.
+
+---
+
 ## 1. Summary
 
 The codebase is small, tidy and consistent. The audio design (Oboe → lock-free SPSC queues → worker thread → effect chain → sink) is sound. The problems are concentrated in three places:

@@ -19,7 +19,7 @@ fun AudioService.startAudioService() : Int {
   val text = getString(R.string.service_notification_text)
 
   val channel = NotificationChannel(id, name,
-    NotificationManager.IMPORTANCE_DEFAULT)
+    NotificationManager.IMPORTANCE_LOW)
 
   val notifications = NotificationManagerCompat.from(this)
   notifications.createNotificationChannel(channel)
@@ -39,7 +39,7 @@ fun AudioService.startAudioService() : Int {
   ServiceCompat.startForeground(this, 1, notification.build(),
     ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
 
-  return Service.START_STICKY
+  return Service.START_NOT_STICKY
 }
 
 fun AudioService.bindAudioService() : AudioServiceBinder {
