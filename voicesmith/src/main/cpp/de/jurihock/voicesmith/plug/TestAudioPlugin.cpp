@@ -7,7 +7,7 @@
 
 TestAudioPlugin::TestAudioPlugin(jna_callback* callback) :
   callback(callback) {
-  state.voice = std::make_shared<StereoChainEffect<DelayEffect, PitchTimbreShiftEffect>>();
+  state.voice = std::make_shared<StereoChainEffect<DelayEffect, PitchTimbreShiftEffect, EchoEffect>>();
   state.effects = std::make_shared<SelectorEffect>();
   state.effects->add("voice", state.voice);
   state.effects->add("noise", std::make_shared<StereoChainEffect<NoiseEffect>>());
@@ -49,6 +49,21 @@ void TestAudioPlugin::set(const std::string& param,
   else if (param == "timbre") {
     state.voice->get<PitchTimbreShiftEffect>([value](auto effect){
       effect->timbre(value);
+    });
+  }
+  else if (param == "echotime") {
+    state.voice->get<EchoEffect>([value](auto effect){
+      effect->time(value);
+    });
+  }
+  else if (param == "echofeedback") {
+    state.voice->get<EchoEffect>([value](auto effect){
+      effect->feedback(value);
+    });
+  }
+  else if (param == "echomix") {
+    state.voice->get<EchoEffect>([value](auto effect){
+      effect->mix(value);
     });
   }
   else {

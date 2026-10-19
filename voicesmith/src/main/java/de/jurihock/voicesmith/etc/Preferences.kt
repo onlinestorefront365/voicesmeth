@@ -37,6 +37,18 @@ class Preferences(context: Context) {
     get() { return preferences.getInt(::mode.name, 0) }
     set(value) { preferences.edit().putInt(::mode.name, value).apply() }
 
+  var echotime: Int
+    get() { return preferences.getInt(::echotime.name, 250) }
+    set(value) { preferences.edit().putInt(::echotime.name, value).apply() }
+
+  var echofeedback: Int
+    get() { return preferences.getInt(::echofeedback.name, 40) }
+    set(value) { preferences.edit().putInt(::echofeedback.name, value).apply() }
+
+  var echomix: Int
+    get() { return preferences.getInt(::echomix.name, 0) }
+    set(value) { preferences.edit().putInt(::echomix.name, value).apply() }
+
   var delay: Int
     get() { return preferences.getInt(::delay.name, 0) }
     set(value) { preferences.edit().putInt(::delay.name, value).apply() }

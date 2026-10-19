@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="echo_feedback">Echo feedback</string>
+  <string name="echo_mix">Echo mix</string>
+  <string name="echo_time">Echo time</string>
+  <string name="percent">%</string>
   <string name="delay">Delay</string>
   <string name="input">Input</string>
   <string name="milliseconds">ms</string>

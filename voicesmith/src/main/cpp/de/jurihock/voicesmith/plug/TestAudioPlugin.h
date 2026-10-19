@@ -8,6 +8,7 @@
 
 #include <voicesmith/fx/StereoChainEffect.h>
 #include <voicesmith/fx/DelayEffect.h>
+#include <voicesmith/fx/EchoEffect.h>
 #include <voicesmith/fx/NoiseEffect.h>
 #include <voicesmith/fx/PitchTimbreShiftEffect.h>
 #include <voicesmith/fx/SelectorEffect.h>
@@ -50,7 +51,7 @@ private:
   struct {
 
     std::shared_ptr<AudioPipeline> pipeline;
-    std::shared_ptr<StereoChainEffect<DelayEffect, PitchTimbreShiftEffect>> voice;
+    std::shared_ptr<StereoChainEffect<DelayEffect, PitchTimbreShiftEffect, EchoEffect>> voice;
     std::shared_ptr<SelectorEffect> effects;
 
   } state;

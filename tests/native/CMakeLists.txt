@@ -19,7 +19,8 @@ FetchContent_MakeAvailable(fmt)
 
 add_executable(tests
   tests.cpp
-  "${SRCDIR}/fx/DelayEffect.cpp")
+  "${SRCDIR}/fx/DelayEffect.cpp"
+  "${SRCDIR}/fx/EchoEffect.cpp")
 
 target_compile_features(tests PRIVATE cxx_std_20)
 target_compile_options(tests PRIVATE -Wall -Werror -g -fsanitize=address,undefined -fno-omit-frame-pointer)

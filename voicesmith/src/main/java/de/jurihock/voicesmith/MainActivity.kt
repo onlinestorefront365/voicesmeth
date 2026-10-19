@@ -45,6 +45,9 @@ class MainActivity : AudioServiceActivity() {
   private val delay = mutableIntStateOf(0)
   private val pitch = mutableIntStateOf(0)
   private val timbre = mutableIntStateOf(0)
+  private val echotime = mutableIntStateOf(250)
+  private val echofeedback = mutableIntStateOf(40)
+  private val echomix = mutableIntStateOf(0)
   private val state = mutableStateOf(false)
 
   private val modeTitles = intArrayOf(
@@ -56,6 +59,9 @@ class MainActivity : AudioServiceActivity() {
     delay.intValue = preferences.delay
     pitch.intValue = preferences.pitch
     timbre.intValue = preferences.timbre
+    echotime.intValue = preferences.echotime
+    echofeedback.intValue = preferences.echofeedback
+    echomix.intValue = preferences.echomix
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -120,6 +126,30 @@ class MainActivity : AudioServiceActivity() {
                 onChange = {
                   timbre.intValue = it
                   preferences.timbre = it
+                })
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
+              IntParameterScreen(
+                name = getString(R.string.echo_time), unit = getString(R.string.milliseconds), value = echotime,
+                min = 50, max = 1000, inc = 50,
+                onChange = {
+                  echotime.intValue = it
+                  preferences.echotime = it
+                })
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
+              IntParameterScreen(
+                name = getString(R.string.echo_feedback), unit = getString(R.string.percent), value = echofeedback,
+                min = 0, max = 90, inc = 5,
+                onChange = {
+                  echofeedback.intValue = it
+                  preferences.echofeedback = it
+                })
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
+              IntParameterScreen(
+                name = getString(R.string.echo_mix), unit = getString(R.string.percent), value = echomix,
+                min = 0, max = 100, inc = 5,
+                onChange = {
+                  echomix.intValue = it
+                  preferences.echomix = it
                 })
               Spacer(modifier = Modifier.weight(1f))
             }

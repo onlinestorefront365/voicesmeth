@@ -3,6 +3,7 @@
 #include <voicesmith/etc/Noise.h>
 #include <voicesmith/etc/Oscillator.h>
 #include <voicesmith/fx/DelayEffect.h>
+#include <voicesmith/fx/EchoEffect.h>
 #include <voicesmith/fx/NoiseEffect.h>
 #include <voicesmith/fx/SelectorEffect.h>
 #include <voicesmith/fx/SineEffect.h>
@@ -155,7 +156,65 @@ static void test_selector() {
   CHECK(thrown);
 }
 
+static void test_echo() {
+  const float samplerate = 1000;
+  const size_t blocksize = 10;
+
+  EchoEffect echo;
+  echo.reset(samplerate, blocksize, 1);
+  echo.time("20");     // 20 samples
+  echo.feedback("50"); // each repeat at half amplitude
+  echo.mix("100");
+
+  std::vector<float> impulse(blocksize, 0.f), silence(blocksize, 0.f), output(blocksize);
+  impulse[0] = 1.f;
+
+  std::vector<float> all;
+  echo.apply(0, impulse, output);
+  all.insert(all.end(), output.begin(), output.end());
+  for (size_t i = 1; i < 8; ++i) {
+    echo.apply(i, silence, output);
+    all.insert(all.end(), output.begin(), output.end());
+  }
+
+  for (size_t i = 0; i < all.size(); ++i) {
+    const float expected = (i == 0) ? 1.f : (i == 20) ? 1.f : (i == 40) ? .5f : (i == 60) ? .25f : 0.f;
+    CHECK(std::abs(all[i] - expected) < 1e-6f);
+  }
+}
+
+static void test_echo_off_is_passthrough() {
+  EchoEffect echo;
+  echo.reset(1000, 4, 1);
+
+  const std::vector<float> input {1, 2, 3, 4};
+  std::vector<float> output(4);
+  echo.apply(0, input, output);
+
+  CHECK(output == input);
+}
+
+static void test_echo_extreme_settings_are_bounded() {
+  EchoEffect echo;
+  echo.reset(1000, 100, 1);
+  echo.time("100000");
+  echo.feedback("1000");
+  echo.mix("1000");
+
+  std::vector<float> input(100, 1.f), output(100);
+  float peak = 0;
+  for (size_t i = 0; i < 500; ++i) {
+    echo.apply(i, input, output);
+    for (const auto x : output) peak = std::max(peak, std::abs(x));
+  }
+
+  CHECK(std::isfinite(peak) && peak < 100.f);
+}
+
 int main() {
+  test_echo();
+  test_echo_off_is_passthrough();
+  test_echo_extreme_settings_are_bounded();
   test_delay_maximum_is_in_bounds();
   test_delay_offset();
   test_delay_zero_is_passthrough();
