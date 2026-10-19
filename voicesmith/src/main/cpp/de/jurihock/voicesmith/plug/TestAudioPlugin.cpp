@@ -5,16 +5,14 @@
 #include <voicesmith/io/AudioSink.h>
 #include <voicesmith/io/AudioSource.h>
 
-#include <voicesmith/fx/BypassEffect.h>
-#include <voicesmith/fx/NoiseEffect.h>
-#include <voicesmith/fx/NullEffect.h>
-#include <voicesmith/fx/SineEffect.h>
-#include <voicesmith/fx/SweepEffect.h>
-#include <voicesmith/fx/VadEffect.h>
-
 TestAudioPlugin::TestAudioPlugin(jna_callback* callback) :
   callback(callback) {
-  state.effects = std::make_shared<StereoChainEffect<DelayEffect, PitchTimbreShiftEffect>>();
+  state.voice = std::make_shared<StereoChainEffect<DelayEffect, PitchTimbreShiftEffect, EchoEffect>>();
+  state.effects = std::make_shared<SelectorEffect>();
+  state.effects->add("voice", state.voice);
+  state.effects->add("noise", std::make_shared<StereoChainEffect<NoiseEffect>>());
+  state.effects->add("sine", std::make_shared<StereoChainEffect<SineEffect>>());
+  state.effects->add("sweep", std::make_shared<StereoChainEffect<SweepEffect>>());
 }
 
 TestAudioPlugin::~TestAudioPlugin() {
@@ -35,20 +33,41 @@ void TestAudioPlugin::setup(const std::optional<int> input,
 
 void TestAudioPlugin::set(const std::string& param,
                           const std::string& value) {
-  if (param == "delay") {
-    state.effects->get<DelayEffect>([value](auto effect){
+  if (param == "mode") {
+    state.effects->select(value);
+  }
+  else if (param == "delay") {
+    state.voice->get<DelayEffect>([value](auto effect){
       effect->delay(value);
     });
   }
-  if (param == "pitch") {
-    state.effects->get<PitchTimbreShiftEffect>([value](auto effect){
+  else if (param == "pitch") {
+    state.voice->get<PitchTimbreShiftEffect>([value](auto effect){
       effect->pitch(value);
     });
   }
-  if (param == "timbre") {
-    state.effects->get<PitchTimbreShiftEffect>([value](auto effect){
+  else if (param == "timbre") {
+    state.voice->get<PitchTimbreShiftEffect>([value](auto effect){
       effect->timbre(value);
     });
+  }
+  else if (param == "echotime") {
+    state.voice->get<EchoEffect>([value](auto effect){
+      effect->time(value);
+    });
+  }
+  else if (param == "echofeedback") {
+    state.voice->get<EchoEffect>([value](auto effect){
+      effect->feedback(value);
+    });
+  }
+  else if (param == "echomix") {
+    state.voice->get<EchoEffect>([value](auto effect){
+      effect->mix(value);
+    });
+  }
+  else {
+    throw std::invalid_argument("Invalid plugin parameter " + param + "!");
   }
 }
 
@@ -56,13 +75,6 @@ void TestAudioPlugin::start() {
   if (state.pipeline != nullptr) {
     return;
   }
-
-  // auto bypass = std::make_shared<BypassEffect>();
-  // auto noise = std::make_shared<NoiseEffect>(1.f);
-  // auto null = std::make_shared<NullEffect>();
-  // auto sine = std::make_shared<SineEffect>(1.f, 440.f);
-  // auto sweep = std::make_shared<SweepEffect>(1.f, std::make_pair(440.f, 2*440.f), 2.f);
-  // auto vad = std::make_shared<VadEffect>();
 
   auto source = std::make_shared<AudioSource>(config.input, config.samplerate, config.blocksize, config.channels);
   auto sink = std::make_shared<AudioSink>(config.output, config.samplerate, config.blocksize, config.channels);
@@ -72,9 +84,18 @@ void TestAudioPlugin::start() {
     callback(!code, data.c_str());
   });
 
+  // a failing open() must not leave a half initialized pipeline behind
+  pipe->open();
+
   state.pipeline = pipe;
-  state.pipeline->open();
-  state.pipeline->start();
+
+  try {
+    pipe->start();
+  }
+  catch (...) {
+    stop();
+    throw;
+  }
 }
 
 void TestAudioPlugin::stop() {

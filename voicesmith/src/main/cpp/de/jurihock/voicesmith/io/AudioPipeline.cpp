@@ -76,18 +76,36 @@ void AudioPipeline::close() {
 void AudioPipeline::start() {
   stop();
 
+  state.cancel = false;
+
   state.thread = std::make_shared<std::thread>(
     [&]() { onloop(); });
 
-  sink->start();
-  source->start();
+  try {
+    sink->start();
+    source->start();
+  }
+  catch (...) {
+    stop();
+    throw;
+  }
 
-  state.loop = true;
+  {
+    std::unique_lock lock(state.mutex);
+    state.loop = true;
+  }
+
   state.signal.notify_all();
 }
 
 void AudioPipeline::stop() {
-  state.loop = false;
+  {
+    std::unique_lock lock(state.mutex);
+    state.loop = false;
+    state.cancel = true;
+  }
+
+  state.signal.notify_all();
 
   if (state.thread != nullptr) {
     if (state.thread->joinable()) {
@@ -134,9 +152,10 @@ void AudioPipeline::onloop() {
         index, count));
   });
 
-  if (!state.loop) {
+  {
     std::unique_lock lock(state.mutex);
-    state.signal.wait_for(lock, std::chrono::seconds(1));
+    state.signal.wait_for(lock, std::chrono::seconds(1),
+      [&]() { return state.loop || state.cancel; });
   }
 
   if (!state.loop) {

@@ -30,8 +30,11 @@ struct jna_result {
 
   bool nok(const std::string& what) {
     okay = false;
-    min_error_length = std::min(max_error_length, static_cast<int>(what.size()));
-    std::memcpy(error, what.data(), min_error_length);
+    min_error_length = 0;
+    if (error != nullptr && max_error_length > 0) {
+      min_error_length = std::min(max_error_length, static_cast<int>(what.size()));
+      std::memcpy(error, what.data(), min_error_length);
+    }
     return okay;
   }
 

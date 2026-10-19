@@ -12,6 +12,7 @@ VadEffect::VadEffect(const int level, const float window) :
   if (!ok) {
     Log::e("Unable to initialize the VAD processor!");
     vad = nullptr;
+    return;
   }
 
   WebRtcVad_set_mode(vad.get(), std::clamp(config.level, 0, 3));

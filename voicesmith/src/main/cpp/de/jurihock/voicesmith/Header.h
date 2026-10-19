@@ -7,9 +7,13 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <complex>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <condition_variable>
 #include <deque>
 #include <functional>

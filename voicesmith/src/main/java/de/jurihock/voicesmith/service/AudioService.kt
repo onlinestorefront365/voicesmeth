@@ -28,9 +28,13 @@ class AudioService : Service(), SharedPreferences.OnSharedPreferenceChangeListen
         preferences.samplerate,
         preferences.blocksize,
         preferences.channels)
+      plugin?.set("mode", preferences.modeName)
       plugin?.set("delay", preferences.delay.toString())
       plugin?.set("pitch", preferences.pitch.toString())
       plugin?.set("timbre", preferences.timbre.toString())
+      plugin?.set("echotime", preferences.echotime.toString())
+      plugin?.set("echofeedback", preferences.echofeedback.toString())
+      plugin?.set("echomix", preferences.echomix.toString())
     } catch (exception: Throwable) {
       Log.e(exception)
     }
@@ -101,9 +105,13 @@ class AudioService : Service(), SharedPreferences.OnSharedPreferenceChangeListen
       "samplerate" -> reset()
       "blocksize" -> reset()
       "channels" -> reset()
+      "mode" -> plugin?.set("mode", preferences.modeName)
       "delay" -> plugin?.set("delay", preferences.delay.toString())
       "pitch" -> plugin?.set("pitch", preferences.pitch.toString())
       "timbre" -> plugin?.set("timbre", preferences.timbre.toString())
+      "echotime" -> plugin?.set("echotime", preferences.echotime.toString())
+      "echofeedback" -> plugin?.set("echofeedback", preferences.echofeedback.toString())
+      "echomix" -> plugin?.set("echomix", preferences.echomix.toString())
     }
   }
 

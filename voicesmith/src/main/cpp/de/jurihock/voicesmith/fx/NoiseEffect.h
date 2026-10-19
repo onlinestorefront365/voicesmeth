@@ -9,7 +9,7 @@ class NoiseEffect final : public AudioEffect {
 
 public:
 
-  NoiseEffect(const float amplitude) :
+  NoiseEffect(const float amplitude = 0.25f) :
     amplitude(amplitude) {
   }
 

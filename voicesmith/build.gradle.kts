@@ -12,7 +12,8 @@
 // https://docs.gradle.org/current/userguide/gradle_wrapper.html#sec:upgrading_wrapper
 
 // Android SDK and JVM compatibility considerations:
-// - Oboe with AAudio API requires at least SDK 27 (consider as minSdk, see also issue #33)
+// - Oboe with AAudio API requires at least SDK 27, but the app itself uses
+//   APIs from SDK 33 (PackageInfoFlags, GameManager), hence minSdk is 33 (see also issue #33)
 // - Samsung Galaxy A13 5G is our main device running Android 14 (consider as targetSdk)
 // - set compileSdk as high as required by project dependencies
 // - set Java compatibility version according to

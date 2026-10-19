@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -21,6 +24,7 @@ import de.jurihock.voicesmith.etc.Vibrator
 import de.jurihock.voicesmith.io.AudioDevices
 import de.jurihock.voicesmith.io.selectChannels
 import de.jurihock.voicesmith.io.selectInputDevice
+import de.jurihock.voicesmith.io.selectMode
 import de.jurihock.voicesmith.io.selectOutputDevice
 import de.jurihock.voicesmith.service.AudioServiceActivity
 import de.jurihock.voicesmith.ui.IntParameterScreen
@@ -37,16 +41,27 @@ class MainActivity : AudioServiceActivity() {
   private val vibrator by lazy { Vibrator(this) }
 
   private val channels = mutableIntStateOf(1)
+  private val mode = mutableIntStateOf(0)
   private val delay = mutableIntStateOf(0)
   private val pitch = mutableIntStateOf(0)
   private val timbre = mutableIntStateOf(0)
+  private val echotime = mutableIntStateOf(250)
+  private val echofeedback = mutableIntStateOf(40)
+  private val echomix = mutableIntStateOf(0)
   private val state = mutableStateOf(false)
+
+  private val modeTitles = intArrayOf(
+    R.string.mode_voice, R.string.mode_noise, R.string.mode_sine, R.string.mode_sweep)
 
   private fun sync() {
     channels.intValue = preferences.channels
+    mode.intValue = preferences.mode
     delay.intValue = preferences.delay
     pitch.intValue = preferences.pitch
     timbre.intValue = preferences.timbre
+    echotime.intValue = preferences.echotime
+    echofeedback.intValue = preferences.echofeedback
+    echomix.intValue = preferences.echomix
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +100,10 @@ class MainActivity : AudioServiceActivity() {
             }) { padding ->
             Column(modifier = Modifier.padding(padding).padding(Dp(UI.PADDING))) {
               Spacer(modifier = Modifier.weight(1f))
+              OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = { onSelectMode() }) {
+                Text(text = getString(modeTitles[mode.intValue.coerceIn(0, modeTitles.size - 1)]))
+              }
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
               IntParameterScreen(
                 name = getString(R.string.delay), unit = getString(R.string.milliseconds), value = delay,
                 min = 0, max = 1000, inc = 50,
@@ -107,6 +126,30 @@ class MainActivity : AudioServiceActivity() {
                 onChange = {
                   timbre.intValue = it
                   preferences.timbre = it
+                })
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
+              IntParameterScreen(
+                name = getString(R.string.echo_time), unit = getString(R.string.milliseconds), value = echotime,
+                min = 50, max = 1000, inc = 50,
+                onChange = {
+                  echotime.intValue = it
+                  preferences.echotime = it
+                })
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
+              IntParameterScreen(
+                name = getString(R.string.echo_feedback), unit = getString(R.string.percent), value = echofeedback,
+                min = 0, max = 90, inc = 5,
+                onChange = {
+                  echofeedback.intValue = it
+                  preferences.echofeedback = it
+                })
+              Spacer(modifier = Modifier.height(Dp(UI.PADDING)))
+              IntParameterScreen(
+                name = getString(R.string.echo_mix), unit = getString(R.string.percent), value = echomix,
+                min = 0, max = 100, inc = 5,
+                onChange = {
+                  echomix.intValue = it
+                  preferences.echomix = it
                 })
               Spacer(modifier = Modifier.weight(1f))
             }
@@ -145,6 +188,13 @@ class MainActivity : AudioServiceActivity() {
   private fun onSelectOutputDevice() {
     devices.selectOutputDevice(preferences.output) {
       preferences.output = it
+    }
+  }
+
+  private fun onSelectMode() {
+    devices.selectMode(preferences.mode) {
+      mode.intValue = it
+      preferences.mode = it
     }
   }
 

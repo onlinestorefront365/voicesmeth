@@ -35,12 +35,14 @@ public:
   }
 
   std::complex<T> operator()() {
-    return phasor *= omega;
+    phasor *= omega;
+    return renormalize();
   }
 
   std::complex<T> operator()(const T frequency) {
     omega = std::polar<T>(T(1), pi * frequency / samplerate);
-    return phasor *= omega;
+    phasor *= omega;
+    return renormalize();
   }
 
   T cos() {
@@ -60,6 +62,12 @@ public:
   }
 
 private:
+
+  // keep the phasor on the unit circle to avoid amplitude drift
+  std::complex<T>& renormalize() {
+    phasor *= (T(3) - std::norm(phasor)) / T(2);
+    return phasor;
+  }
 
   const T pi = T(2) * std::acos(T(-1));
 

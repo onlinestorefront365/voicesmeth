@@ -48,7 +48,8 @@ private:
     std::shared_ptr<std::thread> thread;
     std::condition_variable signal;
     std::mutex mutex;
-    bool loop;
+    std::atomic<bool> loop {false};
+    std::atomic<bool> cancel {false};
 
   } state;
 

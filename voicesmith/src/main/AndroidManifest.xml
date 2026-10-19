@@ -15,9 +15,11 @@
   <application android:name="de.jurihock.voicesmith.Main"
                android:label="@string/title"
                android:icon="@drawable/voicesmith"
+               android:allowBackup="false"
                android:appCategory="game">
 
     <activity android:name="de.jurihock.voicesmith.MainActivity"
+              android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
               android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
